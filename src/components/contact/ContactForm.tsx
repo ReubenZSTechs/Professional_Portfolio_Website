@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useTurnstile } from "@/components/security/useTurnstile";
 import { ApiError, sendContact } from "@/lib/api";
 
 type Status = { kind: "idle" } | { kind: "sending" } | { kind: "sent" } | { kind: "error"; message: string };
@@ -9,6 +10,7 @@ const fieldClass =
   "min-h-11 rounded-[10px] border border-inverse-line bg-inverse-surface px-3.5 text-inverse-ink placeholder:text-inverse-muted/60";
 
 export function ContactForm() {
+  const turnstile = useTurnstile("contact");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -22,6 +24,7 @@ export function ContactForm() {
         email: String(data.get("email") ?? ""),
         message: String(data.get("message") ?? ""),
         company: String(data.get("company") ?? ""), // honeypot: real people leave it empty
+        turnstileToken: await turnstile.getToken(),
       });
       form.reset();
       setStatus({ kind: "sent" });
@@ -66,6 +69,7 @@ export function ContactForm() {
           {status.message}
         </p>
       )}
+      {turnstile.slot}
       <button
         type="submit"
         disabled={status.kind === "sending"}

@@ -18,6 +18,7 @@ Everything about how this portfolio works, how to run it, and how to change it.
 | Retrieval: sources, chunking, embeddings, re-indexing | [rag.md](rag.md) |
 | Supabase tables, RPCs, security model, migrations | [database.md](database.md) |
 | HTTP API (`/api/py/chat`, `/contact`, `/health`) | [api.md](api.md) |
+| Security model, guardrails, incident runbook | [security.md](security.md) |
 | Colours, typography, components, dark mode | [design-system.md](design-system.md) |
 | Unit tests, live evals, CI | [testing.md](testing.md) |
 | Why things are built this way | [decisions/](decisions/) |

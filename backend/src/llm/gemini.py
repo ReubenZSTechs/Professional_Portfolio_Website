@@ -60,6 +60,30 @@ def l2_normalize(vector: Sequence[float]) -> list[float]:
     return [x / norm for x in vector]
 
 
+class SafetyBlockedError(GeminiError):
+    """Gemini's safety filters stopped the answer (harassment, hate, sexual, dangerous content)."""
+
+
+# Google's content filters on every generation call (docs/security.md, model-level safety).
+SAFETY_SETTINGS = [
+    types.SafetySetting(
+        category=category, threshold=types.HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE
+    )
+    for category in (
+        types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+        types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    )
+]
+SAFETY_FINISH_REASONS = {
+    types.FinishReason.SAFETY,
+    types.FinishReason.PROHIBITED_CONTENT,
+    types.FinishReason.BLOCKLIST,
+    types.FinishReason.SPII,
+}
+
+
 class ModelUnavailableError(GeminiError):
     """Every model in the fallback chain was overloaded, rate-limited, missing or timed out."""
 
@@ -162,6 +186,7 @@ class GeminiClient:
             thinking_config=types.ThinkingConfig(thinking_level=thinking_level)
             if thinking_level
             else None,
+            safety_settings=SAFETY_SETTINGS,
             **extra,
         )
 
@@ -301,6 +326,8 @@ class GeminiClient:
                     if chunk.text:
                         started = True
                         yield chunk.text
+                if finish in SAFETY_FINISH_REASONS:
+                    raise SafetyBlockedError(f"{m} stopped the answer: {finish}")
                 if finish == types.FinishReason.MAX_TOKENS:
                     log.warning(
                         "gemini_answer_truncated",

@@ -1,0 +1,45 @@
+# Weekly dependency updates. Minor and patch bumps are grouped into one PR per
+# ecosystem; major bumps still arrive one per PR so breaking changes get reviewed alone.
+# Security updates (Dependabot alerts) are raised separately and are not capped here.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: [dependencies, javascript]
+    commit-message:
+      prefix: "deps(npm)"
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+
+  # Root requirements.txt is what Vercel installs for /api/py.
+  # backend/pyproject.toml mirrors these pins; keep it in sync when merging.
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: [dependencies, python]
+    commit-message:
+      prefix: "deps(pip)"
+    groups:
+      pip-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: [dependencies, github-actions]
+    commit-message:
+      prefix: "deps(actions)"
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]

@@ -104,15 +104,32 @@ The default model ids are in `backend/src/core/config.py`: chat `gemini-3.6-flas
 
 ---
 
-## 4. Generate `IP_HASH_SALT`
+## 4. Generate `IP_HASH_SALT` and `CHAT_SIGNING_SECRET`
 
-Visitor IPs are hashed with this salt before they are stored for rate limiting. The code falls back to `change-me` if it isn't set, so set a real one.
+Two random secrets (see [security.md](security.md)):
+- `IP_HASH_SALT`: visitor IPs are hashed with it before they're stored for rate limiting.
+- `CHAT_SIGNING_SECRET`: signs chat sessions and the bot's answers, so nobody can forge chat history. **Required** once deployed; the chat refuses to run without it.
 
-- [ ] Run:
+- [ ] Run this **twice** and save each 64-character output, one per variable:
   ```bash
   openssl rand -hex 32
   ```
-- [ ] Save the 64-character output. This is `IP_HASH_SALT`. Use the same value everywhere; changing it later just resets everyone's rate-limit counters.
+- [ ] Use the same values everywhere. Changing `IP_HASH_SALT` later resets rate-limit counters; changing `CHAT_SIGNING_SECRET` just ends open chat sessions.
+
+---
+
+## 4b. Cloudflare Turnstile (bot check)
+
+Turnstile is Cloudflare's free, invisible "are you human?" check. It protects the chat and contact form from scripts. It's **required** when deployed (fail closed).
+
+- [ ] Sign in (or sign up, free) at <https://dash.cloudflare.com> → **Turnstile** (left sidebar) → **Add widget**.
+- [ ] **Widget name:** anything you'll recognise, e.g. `Portfolio Website Bot Checker`.
+- [ ] **Hostnames:** your production domain only, e.g. `reubensusanto.vercel.app` (whatever your Vercel project name gives you; type just the host, without `https://`). Add your custom domain here later if you buy one. You don't need `localhost`: locally you either leave the keys empty or use the test keys.
+- [ ] **Widget mode:** **Managed** (the recommended default). Most visitors pass invisibly; only suspicious traffic gets a one-click checkbox, which the site shows inside the chat panel or contact form. *Invisible* would never let a real but "suspicious-looking" visitor prove they're human, so they'd just be refused.
+- [ ] **Skip future security rule challenges (pre-clearance):** leave **off**. It only works for sites proxied through Cloudflare, and this one is served by Vercel.
+- [ ] Click **Create**.
+- [ ] Copy the **Site Key** (public) → `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, and the **Secret Key** → `TURNSTILE_SECRET_KEY` (server-only).
+- [ ] **Locally** you may instead leave both empty (the check is skipped in development) or use Cloudflare's always-pass test keys listed in `.env.example`.
 
 ---
 
@@ -122,7 +139,7 @@ Visitor IPs are hashed with this salt before they are stored for rate limiting. 
   ```bash
   cp .env.example .env
   ```
-- [ ] Open `.env` and fill in `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL` (your Resend sign-up address, see step 3) and `IP_HASH_SALT`. Leave `ENVIRONMENT=development` and `NEXT_PUBLIC_SITE_URL=http://localhost:3000` as they are for local use.
+- [ ] Open `.env` and fill in `GEMINI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `CONTACT_TO_EMAIL` (your Resend sign-up address, see step 3), `IP_HASH_SALT` and `CHAT_SIGNING_SECRET` (step 4), and optionally the Turnstile keys (step 4b). Leave `ENVIRONMENT=development` and `NEXT_PUBLIC_SITE_URL=http://localhost:3000` as they are for local use.
 - [ ] **Preview the indexing** (no API calls, nothing written):
   ```bash
   .venv/bin/python backend/scripts/ingest.py --dry-run
@@ -164,13 +181,17 @@ Visitor IPs are hashed with this salt before they are stored for rate limiting. 
   | `CONTACT_TO_EMAIL` | Your Resend sign-up address (step 3) | ✅ | ✅ |
   | `CONTACT_FROM_EMAIL` | `Portfolio <onboarding@resend.dev>` until you verify a domain | ✅ | ✅ |
   | `IP_HASH_SALT` | Step 4 | ✅ | ✅ |
-  | `ENVIRONMENT` | Type `production` (hides the API docs at `/api/py/docs`) | ✅ | ✅ |
+  | `CHAT_SIGNING_SECRET` | Step 4 (server-only secret) | ✅ | ✅ |
+  | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Step 4b (public site key). **Preview:** test key `1x00000000000000000000AA` | ✅ | test key |
+  | `TURNSTILE_SECRET_KEY` | Step 4b (server-only secret). **Preview:** test key `1x0000000000000000000000000000000AA` | ✅ | test key |
+  | `ENVIRONMENT` | Type `production` (hides the API docs, and every security check fails closed) | ✅ | ✅ |
   | `NEXT_PUBLIC_SITE_URL` | `https://<project-name>.vercel.app`, no trailing slash. Custom domain later (step 9) | ✅ | — |
   | `GEMINI_CHAT_MODEL` | Optional. Leave unset to use the default | optional | optional |
   | `GEMINI_REWRITE_MODEL` | Optional. Leave unset to use the default | optional | optional |
   | `GEMINI_EMBED_MODEL` | Optional. **Changing it means re-indexing everything** (`ingest.py --force`) | optional | optional |
 
   Variables added on this import screen apply to every environment. That's fine for a first deploy; you can narrow them later in **Settings → Environment Variables**.
+  **Turnstile on preview deployments:** preview URLs (`<project>-git-<branch>-reubenzstechs.vercel.app`) change with every branch, so they can't all be listed as widget hostnames, and the bot check would fail there. After the first deploy, edit the two Turnstile variables: keep your real keys for **Production** only, and add Cloudflare's always-pass test keys (table above) for **Preview**. Production stays protected; previews still have rate limits and the daily cap.
 - [ ] Click **Deploy** and wait for the build (a few minutes).
   **Check:** you see the "Congratulations" screen with a preview of the site. Click **Continue to Dashboard**. The URL under **Domains** is your live site. If it differs from what you put in `NEXT_PUBLIC_SITE_URL` (Vercel adds a suffix when a name is taken), fix the variable in **Settings → Environment Variables** and redeploy (**Deployments** → newest → **⋯** → **Redeploy**).
 
@@ -188,8 +209,7 @@ Replace `<site>` with your live URL.
   ```bash
   curl -s https://<site>/api/py/health
   ```
-  **Check:** `"status": "ok"`, `"environment": "production"`, and
-  `"configured": {"gemini": true, "supabase": true, "resend": true}`. Any `false` means that variable is missing or misspelled in Vercel (then redeploy).
+  **Check:** exactly `{"status":"ok"}`. Deployed, the health check deliberately reveals nothing else (see [security.md](security.md)). A missing key shows up instead in the chatbot check below ("isn't available right now" means a Turnstile or `CHAT_SIGNING_SECRET` variable is missing; "isn't configured yet" means Gemini or Supabase). To see which, check **Vercel → Logs** for `MissingSettingError`.
 
 > [!WARNING]
 > **If `/api/py/health` returns 404.** The Python-function routing (the rewrite to `/api/index`) has been tested locally but **not yet on a real Vercel deployment**, so this is the most likely first-deploy problem. Follow [troubleshooting.md → API returns 404 on Vercel](troubleshooting.md#api-returns-404-on-vercel): check the deployment's **Functions** tab lists `api/index.py`, check the rewrite in `next.config.ts`, check the function logs for `ModuleNotFoundError`, and as a fallback change the rewrite destination to `/api` and push again.
@@ -219,14 +239,30 @@ Replace `<site>` with your live URL.
 
 ---
 
+## 8b. Security switches (one-time)
+
+- [ ] **Vercel Firewall rules:** with the [Vercel CLI](https://vercel.com/docs/cli) installed and logged in, run `vercel link` once in the project folder, then:
+  ```bash
+  deploy/vercel-firewall/apply.sh --dry-run
+  ```
+  ```bash
+  deploy/vercel-firewall/apply.sh
+  ```
+  This adds edge rate limits for the chat and contact API and blocks common scanner paths. See `deploy/vercel-firewall/README.md`.
+- [ ] **GitHub secret scanning:** repo → **Settings** → **Code security** → enable **Secret scanning** and **Push protection** (blocks pushes that contain API keys). Also enable **Dependabot alerts** and **Private vulnerability reporting**.
+- [ ] Read the incident runbook in [security.md](security.md#incident-runbook) so you know where the "attack mode" switch is.
+
+---
+
 ## 9. Custom domain (optional)
 
 - [ ] Vercel → your project → **Settings** → **Domains** → enter your domain → **Add**.
 - [ ] At your domain registrar, add the DNS records Vercel shows (an `A` record for the bare domain and/or a `CNAME` for `www`). Wait until Vercel shows **Valid Configuration** (minutes to a few hours).
 - [ ] **Settings** → **Environment Variables** → edit `NEXT_PUBLIC_SITE_URL` to `https://yourdomain.com` (no trailing slash) → **Save**.
-- [ ] **Deployments** → newest → **⋯** → **Redeploy**. `NEXT_PUBLIC_*` values are baked in at build time, so the redeploy is required for the sitemap and social cards to use the new address.
+- [ ] Cloudflare → **Turnstile** → your widget → **Settings** → add `yourdomain.com` to **Hostnames** (otherwise the bot check fails on the new domain).
+- [ ] **Deployments** → newest → **⋯** → **Redeploy**. `NEXT_PUBLIC_*` values are baked in at build time, so the redeploy is required for the sitemap, social cards and the API's trusted-origin list to use the new address.
 
-**Check:** `https://yourdomain.com` loads with a padlock, and `https://yourdomain.com/api/py/health` still shows all `true`.
+**Check:** `https://yourdomain.com` loads with a padlock, `https://yourdomain.com/api/py/health` returns `{"status":"ok"}`, and the chatbot answers.
 
 ---
 

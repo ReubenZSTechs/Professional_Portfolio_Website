@@ -41,12 +41,12 @@ def test_defaults(clean_env):
 def test_env_overrides(clean_env, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("GEMINI_CHAT_MODEL", "gemini-flash-latest")
     monkeypatch.setenv("RAG_TOP_K", "8")
-    monkeypatch.setenv("GEMINI_API_KEY", "secret")
+    monkeypatch.setenv("GEMINI_API_KEY", "sk-test-value-123")
     s = Settings()
     assert s.gemini_chat_model == "gemini-flash-latest"
     assert s.rag_top_k == 8
-    assert s.require("gemini_api_key") == "secret"
-    assert "secret" not in repr(s)  # SecretStr keeps keys out of logs
+    assert s.require("gemini_api_key") == "sk-test-value-123"
+    assert "sk-test-value-123" not in repr(s)  # SecretStr keeps keys out of logs
 
 
 def test_require_missing_raises_clear_error(clean_env):

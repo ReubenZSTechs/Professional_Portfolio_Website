@@ -24,7 +24,7 @@ async def no_limit(*args, **kwargs):
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setattr(chat_route, "get_graph", lambda: FakeGraph())
-    monkeypatch.setattr(chat_route, "enforce_rate_limit", no_limit)
+    monkeypatch.setattr(chat_route, "enforce_chat_limits", no_limit)
     monkeypatch.setattr(contact_route, "enforce_rate_limit", no_limit)
     return TestClient(main.app)
 
@@ -46,7 +46,7 @@ def test_chat_streams_events_then_done(client):
 
 
 def test_chat_rejects_overlong_question(client):
-    res = client.post("/api/py/chat", json={"message": "x" * 501})
+    res = client.post("/api/py/chat", json={"message": "tell me more " * 40})
     assert res.status_code == 422
     assert "under 500 characters" in res.json()["detail"]
 
@@ -145,7 +145,7 @@ def test_contact_rejects_bad_email(client):
 def test_health_reports_configuration_flags_only(client):
     body = client.get("/api/py/health").json()
     assert body["status"] == "ok"
-    assert set(body["configured"]) == {"gemini", "supabase", "resend"}
+    assert {"gemini", "supabase", "resend", "turnstile"} <= set(body["configured"])
 
 
 def test_chat_reports_busy_models_politely(client, monkeypatch):

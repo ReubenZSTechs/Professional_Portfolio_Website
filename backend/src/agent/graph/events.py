@@ -11,7 +11,7 @@ from typing import Any, Literal
 
 from langgraph.config import get_stream_writer
 
-EventName = Literal["status", "token", "sources", "error"]
+EventName = Literal["status", "token", "sources", "retract", "error"]
 
 
 def emit(event: EventName, data: dict[str, Any]) -> None:

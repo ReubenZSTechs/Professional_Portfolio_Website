@@ -62,6 +62,9 @@ Gemini Flash, streaming. The system prompt (`prompts/system.md`) requires:
 
 `unsafe` messages get a fixed reply without calling the model. After streaming, the node emits a `sources` event containing **only the passages the answer cited**, with their original numbers so the `[n]` markers in the text still match.
 
+## Guardrails around the graph
+Before the graph runs, the chat route verifies the history signatures (forged assistant turns are dropped) and screens the message with the deterministic input guard; blocked messages get the refusal without any model call. Inside the graph, untrusted text is fenced with per-request ids (spotlighting), the rewriter's `unsafe` intent routes to the refusal, Gemini's safety filters are on, and `respond` runs a streaming output guard that retracts any answer leaking the canary or prompt text. Details and tests: [security.md](security.md).
+
 ## Model fallback
 Gemini models are sometimes overloaded (`503 high demand`), rate-limited (`429`), retired (`404`) or slow. `backend/src/llm/gemini.py` gives each role an ordered chain: the primary model, then `GEMINI_*_FALLBACK_MODELS`. A call moves to the next model on those errors or a timeout (`GEMINI_TIMEOUT_SECONDS`, default 25 s), after at most one quick retry. Bad requests or invalid keys fail immediately; another model wouldn't help. Streaming answers only switch models before the first token: once text has reached the visitor, it can't be swapped mid-sentence. If every model is down, the chat shows "The AI model is very busy right now" (`code: "busy"`). Fallbacks are logged as `gemini_fallback`, and `/api/py/health` lists the chains. Embeddings never fall back, because vectors from a different model wouldn't match the index.
 

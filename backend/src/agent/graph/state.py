@@ -19,7 +19,9 @@ Intent = Literal["portfolio_question", "greeting", "off_topic", "unsafe"]
 
 class Turn(BaseModel):
     role: Role
-    content: str
+    content: str = Field(max_length=12_000)
+    # HMAC the server attached to an assistant answer (docs/security.md, history integrity).
+    sig: str | None = Field(default=None, max_length=128)
 
 
 class RewriteResult(BaseModel):
@@ -35,6 +37,10 @@ class ChatState(TypedDict, total=False):
     # Input
     question: str
     history: list[Turn]
+    # Guardrails: flagged by the input guard (not blocked), and the spotlighting id.
+    suspicious: bool
+    nonce: str
+    ip_hash: str  # for security-event logs only (salted hash, never the raw IP)
     # compile_history
     recent: list[Turn]  # the turns kept verbatim
     summary: str | None  # summary of older turns, if any
