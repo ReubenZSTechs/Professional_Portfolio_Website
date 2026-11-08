@@ -1,0 +1,66 @@
+---
+title: "SIGAP: Material Shortage Triage Agent"
+slug: sigap-material-shortage-agent
+summary: An agentic MRP and vendor-sourcing system that answers planning questions from live data, drafts multi-vendor purchase orders, and negotiates PO changes with suppliers over Telegram.
+repo: https://github.com/ReubenZSTechs/SIGAP-Agentic-AI-for-Automotive-Material-Shortages
+status: completed
+category: agentic
+tags: [Agentic AI, Tool calling, Text-to-SQL, LLM evaluation, LLM security, Hackathon]
+stack: [Python, FastAPI, LangGraph, SAP AI Core, PostgreSQL, Supabase, sqlglot, React, Vite, Telegram Bot API, Docker]
+timeline: Oct 2026 (hackathon, Demo Day 31 Oct 2026)
+role: Team of 3 · I owned the agent logic, LLM API calls and tools
+highlight: Turns a production request into checked, multi-vendor POs, with a human confirming every step
+featured: true
+order: 2
+lab: false
+---
+
+## The problem
+
+When an automotive plant runs short of a material, a planner has to check the bill of materials against stock and incoming orders, work out the shortfall, pick suppliers, raise purchase orders, then chase each supplier for confirmation. Most of that work is repetitive, and slow replies to MRP messages delay production.
+
+SIGAP was built for the **Intelligence Supply Chain** track of the SOKRATES × BINUS AI Agentic Hackathon and presented at Demo Day on 31 October 2026. It is a full-stack MRP and vendor-sourcing MVP (materials, BOM, scheduling, stock planning, smart sourcing, multi-vendor POs, goods receipt) with LangGraph agents on top.
+
+## How it works
+
+<Pipeline steps={["User message", "Rewrite", "Route", "Plan / resolve", "Tools & SQL", "Evaluate", "Answer or PO card"]} highlight={4} />
+
+One LangGraph graph routes each message into one of three paths:
+
+- **Small talk or off-topic** gets a direct reply.
+- **MRP questions** ("which items are critical?") go through plan → curated tools → synthesise → evaluate. If the evaluator finds missing context or a weak answer, it loops back, at most twice. A fallback text-to-SQL agent covers anything the tools don't.
+- **PO automation** ("I need 100 mountain bikes, materials by tomorrow") parses the request, resolves it against the database, asks for clarification if needed, and shows a confirmation card. After approval it checks the BOM against stock, finds the shortfall, picks as few suppliers as possible (one PO each), creates the production schedule, and issues every PO at once.
+
+A background **supplier agent** then handles each PO over Telegram. It asks the supplier to confirm, accepts date or price changes within manager-set limits, and escalates anything outside them. If a supplier cancels, it finds a replacement supplier. Every agent call (prompt, output, retries, latency, tokens) is logged to an `agent_runs` table for tracing.
+
+## Key decisions
+
+<Decisions>
+  <Decision title="Read-only by default, confirm before writing">
+    The dashboard agent reads data in a READ ONLY transaction with a statement timeout. The only change it can make is a PO, and only after the user confirms. Generated SQL must be a validated `SELECT` (checked with sqlglot) against an allowlist of tables, with a LIMIT of 200 rows or fewer.
+  </Decision>
+  <Decision title="A semantic layer for business formulas">
+    Database views compute available stock, ordered quantity, deficit and CRITICAL/WARNING/SAFE status, so SQL written by the LLM can't miscalculate them.
+  </Decision>
+  <Decision title="Guardrails before the LLM">
+    Supplier messages that try to query internal data, inject prompts, ask for system secrets or pretend to be the manager get a fixed refusal before they ever reach the model.
+  </Decision>
+</Decisions>
+
+Every agent has a prompt config and a JSON Schema output contract; invalid output is repaired once. Answers are scored for faithfulness (claims supported by evidence), relevance and completeness, and must reach a weighted score of 0.80 with faithfulness at least 0.70, or the agent revises.
+
+## Results
+
+<Metrics>
+  <Metric value="0.80" label="Weighted evaluation score an answer needs before it is shown" />
+  <Metric value="≤ 2" label="Automatic revise loops before showing the best draft, flagged as unverified" />
+  <Metric value="3" label="Agent paths: direct reply, MRP Q&A, PO automation" />
+</Metrics>
+
+<Todo>Add a demo result, e.g. how fast the agent triaged the Demo Day scenario compared with doing it by hand, plus the offline golden-set eval scores. Also add a dashboard screenshot as `cover:` (public/images/projects/sigap-material-shortage-agent.webp).</Todo>
+
+## What I'd do next
+
+- Add authentication and approver roles (the MVP takes an approver's name without a login).
+- Connect real ERP and supplier data instead of seeded demo schedules.
+- <Todo>Add one limitation you found while testing with users.</Todo>

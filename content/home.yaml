@@ -1,0 +1,31 @@
+# Homepage sections, top to bottom. Reorder lines to reorder sections,
+# set `enabled: false` to hide one. Section ids are fixed (see docs/content-guide.md).
+sections:
+  - id: hero
+  - id: ask
+    anchor: ask
+    eyebrow: Ask my portfolio
+    title: Ask anything about my projects
+    description: >-
+      Answers come only from my CV, project write-ups and repositories, and every claim
+      links to its source. Built with agentic RAG on Supabase pgvector and Gemini.
+  - id: experience
+    eyebrow: Experience
+    title: Where I've worked on AI
+  - id: projects
+    anchor: work
+    eyebrow: Selected work
+    title: Projects
+  - id: research
+  - id: education
+    eyebrow: Education
+    title: Education & credentials
+  - id: toolkit
+    title: Toolkit
+  - id: leadership
+    title: Leadership & teaching
+  - id: contact
+    title: Let's talk about AI engineering roles.
+    description: >-
+      Open to full-time and internship roles in AI engineering. Based in Jakarta,
+      graduating August 2027.

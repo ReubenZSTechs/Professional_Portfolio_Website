@@ -1,0 +1,13 @@
+# Self-host the API:  docker compose -f deploy/home_server/docker-compose.yaml up -d --build
+# Then point a reverse proxy (nginx, Caddy, Cloudflare Tunnel) at port 8000 for /api/py/*.
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/home_server/Dockerfile
+    env_file: ../../.env
+    environment:
+      ENVIRONMENT: production
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

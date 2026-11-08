@@ -1,0 +1,10 @@
+- institution: Calvin Institute of Technology
+  degree: Bachelor's degree in Computer Science
+  field: Computer Science
+  start: Aug 2023
+  end: Aug 2027 (expected)
+  location: Jakarta, Indonesia
+  gpa: 3.90 / 4.00
+  honors: [Rector's List 2024, Rector's List 2025, Rector's List 2026]
+  thesis: "Calvin-GPT: Agentic RAG and Graph-of-Agents with Graph-of-Thoughts Reasoning"
+  # coursework: [Machine Learning, Deep Learning, NLP]   # optional: uncomment and edit

@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reuben Zachary Susanto – AI Engineer CV</title>
+<meta name="author" content="Reuben Zachary Susanto">
+<meta name="description" content="CV of Reuben Zachary Susanto, AI Engineer (agentic AI, LLM orchestration, fine-tuning and deployment).">
+<!-- Static (non-variable) Inter: Chrome embeds it as real TrueType, so ATS parsers read clean text.
+     Google Fonts serves Inter as a variable font, which Chrome flattens to Type3 glyphs in PDFs. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/400.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/600.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/700.css" rel="stylesheet">
+<style>
+  /* Single-column A4 layout, real text only, so ATS parsers read it top to bottom. */
+  @page { size: A4; margin: 14mm 15mm 13mm; }
+
+  :root {
+    --ink: #1a1d23;
+    --muted: #4b5260;
+    --accent: #1f4e8c;
+    --rule: #c9cfd8;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    background: #fff;
+    color: var(--ink);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 9.4pt;
+    line-height: 1.38;
+    /* Inter's contextual/tabular alternates have no Unicode mapping in the PDF and vanish from extracted text. */
+    font-feature-settings: "calt" 0, "case" 0, "tnum" 0;
+  }
+  /* On screen, show the sheet at A4 width; print uses @page. */
+  @media screen {
+    body { background: #eef0f3; padding: 24px 12px; }
+    main { max-width: 210mm; margin: 0 auto; background: #fff; padding: 14mm 15mm; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  header { margin-bottom: 9pt; }
+  h1 { font-size: 20pt; font-weight: 700; letter-spacing: -0.01em; margin: 0; line-height: 1.15; }
+  .role { font-size: 11pt; font-weight: 600; color: var(--accent); margin: 1pt 0 4pt; }
+  .contact { margin: 0 0 1pt; color: var(--muted); font-size: 8.9pt; }
+  .contact span + span::before { content: "·"; margin: 0 5pt; color: var(--rule); }
+
+  section { margin-top: 8.5pt; }
+  h2 {
+    font-size: 9.6pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--accent); margin: 0 0 4pt; padding-bottom: 2pt; border-bottom: 1px solid var(--rule);
+    break-after: avoid; page-break-after: avoid;
+  }
+
+  .summary { margin: 0; }
+
+  .entry { margin-bottom: 6pt; break-inside: avoid; page-break-inside: avoid; }
+  .entry:last-child { margin-bottom: 0; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 10pt; }
+  .title { font-weight: 600; }
+  .title .stack { font-weight: 400; color: var(--muted); }
+  .date { white-space: nowrap; color: var(--muted); font-size: 8.9pt; }
+  .sub { color: var(--muted); }
+  .note { color: var(--muted); font-size: 8.9pt; margin-top: 0.5pt; }
+
+  ul { margin: 2pt 0 0; padding-left: 12pt; }
+  li { margin: 0 0 1.2pt; padding-left: 1pt; }
+  li::marker { color: var(--muted); }
+
+  .skills { margin: 0; display: grid; grid-template-columns: max-content 1fr; column-gap: 10pt; row-gap: 2pt; }
+  .skills dt { font-weight: 600; }
+  .skills dd { margin: 0; }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <h1>Reuben Zachary Susanto</h1>
+  <p class="role">AI Engineer</p>
+  <p class="contact">
+    <span>Jakarta, Indonesia</span>
+    <span><a href="tel:+628118495021">+62 811-8495-021</a></span>
+    <span><a href="mailto:reuben.zachary.rz@gmail.com">reuben.zachary.rz@gmail.com</a></span>
+  </p>
+  <p class="contact">
+    <span><a href="https://linkedin.com/in/reuben-zachary-susanto">linkedin.com/in/reuben-zachary-susanto</a></span>
+    <span><a href="https://github.com/ReubenZSTechs">github.com/ReubenZSTechs</a></span>
+    <!-- Portfolio: uncomment and fill in once the domain is live.
+    <span><a href="https://PORTFOLIO-DOMAIN">PORTFOLIO-DOMAIN</a></span>
+    -->
+  </p>
+</header>
+
+<section>
+  <h2>Summary</h2>
+  <p class="summary">
+    Final-year Computer Science student (GPA 3.90/4.00) focused on agentic AI: LLM orchestration with LangGraph,
+    fine-tuning (SFT, RL, LoRA) and production deployment. Builds production-grade AI agents, RAG pipelines and
+    evaluation workflows across industry and research internships; 1st place, Technofest UBM 2026.
+  </p>
+</section>
+
+<section>
+  <h2>Experience</h2>
+
+  <div class="entry">
+    <div class="row"><span class="title">Backend AI Engineer Intern · FlyRank AI</span><span class="date">Jun 2026 – Present</span></div>
+    <ul>
+      <li>Implemented AI-driven workflow automation tools, improving productivity by 25%.</li>
+      <li>Developed production-grade AI agents, reducing token costs by 15% through workflow and prompt optimisation.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">AI Research Intern · Calvin Institute of Technology</span><span class="date">Jun 2026 – Aug 2026</span></div>
+    <div class="sub">Jakarta, Indonesia</div>
+    <ul>
+      <li>Developed LLM-based agentic orchestration systems for Q&amp;A workflows.</li>
+      <li>Evaluated AI systems against defined, task-relevant metrics.</li>
+      <li>Optimised AI workflows for production deployment, reducing token usage by up to 20%.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">Personal &amp; Academic Tutor · Freelance</span><span class="date">Jan 2019 – Present</span></div>
+    <div class="sub">Jakarta, Indonesia</div>
+    <ul>
+      <li>Taught mathematics, physics and chemistry at IGCSE and IB level.</li>
+      <li>Started building a student performance tracking system with modern web technologies and AI.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Projects</h2>
+
+  <div class="entry">
+    <div class="row"><span class="title">Personal Finance AI Agent <span class="stack">| RLHF, LLM, RAG</span></span><span class="date">Sep 2026 – Present</span></div>
+    <ul>
+      <li>Developed an AI agent for budgeting, financial analysis and question answering.</li>
+      <li>Improved financial wealth by ~10% in backtesting simulation.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">SIGAP: Agentic MRP &amp; Vendor-Sourcing System <span class="stack">| FastAPI, LangGraph, PostgreSQL/Supabase, React</span></span><span class="date">Oct 2026</span></div>
+    <div class="note">SOKRATES × BINUS AI Agentic Hackathon, Intelligence Supply Chain track · team of 3 · Demo Day, 31&nbsp;Oct&nbsp;2026</div>
+    <ul>
+      <li>Owned the agent logic, LLM API calls and tools: a LangGraph agent that routes each request to MRP Q&amp;A, purchase-order automation or a direct reply.</li>
+      <li>Implemented guarded text-to-SQL, allowing SELECT-only queries (validated with sqlglot) executed in read-only transactions.</li>
+      <li>Built a Telegram supplier agent that negotiates purchase-order changes within manager-set limits.</li>
+      <li>Gated every answer on an LLM-judge score of at least 0.80 before returning it to the user.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">AI Journal Paper Summariser <span class="stack">| LangGraph, LLM, RAG</span></span><span class="date">Apr 2026 – Present</span></div>
+    <ul>
+      <li>Developed an LLM-driven application that summarises journal papers into a PDF report.</li>
+      <li>Fine-tuned an LLM with quantisation and LoRA, using supervised fine-tuning and reinforcement learning on LLaMA-Factory.</li>
+      <li>Reduced literature review time by ~40% in internal testing.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">Plantatio <span class="stack">| LangGraph, RAG, Knowledge Graph</span></span><span class="date">May 2026</span></div>
+    <div class="note">1st place, Technofest UBM 2026</div>
+    <ul>
+      <li>Fine-tuned LLMs with supervised fine-tuning and reinforcement learning using LoRA on LLaMA-Factory and Unsloth.</li>
+      <li>Evaluated models with the RAGAS framework and custom metrics across the AI workflow.</li>
+      <li>Integrated the AI workflow pipeline with the API and frontend.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">Car Damage Classification, Detection &amp; Captioning <span class="stack">| PyTorch, OpenCV, Ultralytics</span></span><span class="date">Nov 2025 – Dec 2025</span></div>
+    <ul>
+      <li>Curated 1,000+ car-damage images and trained a multi-stage deep learning model that detects damage, localises it, estimates its severity and generates a caption.</li>
+      <li>Built a CNN-based localisation model, improving accuracy by 9% and precision by 3% over the baseline.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Education</h2>
+
+  <div class="entry">
+    <div class="row"><span class="title">Calvin Institute of Technology</span><span class="date">Aug 2023 – Aug 2027 (expected)</span></div>
+    <div>Bachelor's degree in Computer Science · GPA 3.90/4.00</div>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">Pelangi Kasih</span><span class="date">Jan 2022 – Jan 2023</span></div>
+    <div>High School Diploma, Natural Sciences (IPA)</div>
+  </div>
+</section>
+
+<section>
+  <h2>Awards</h2>
+
+  <div class="entry">
+    <div class="row"><span class="title">1st place, Technofest UBM 2026 <span class="stack">(Plantatio)</span></span><span class="date">Jun 2026</span></div>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">Rector's List 2024, 2025, 2026 <span class="stack">· Calvin Institute of Technology</span></span><span class="date">2024 – 2026</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Leadership &amp; Volunteering</h2>
+
+  <div class="entry">
+    <div class="row"><span class="title">External Coordinator · Calvin Institute of Technology</span><span class="date">Jan 2025 – Jan 2026</span></div>
+    <div class="sub">Jakarta, Indonesia</div>
+    <ul>
+      <li>Coordinated the external relations team, delivering two seminar programmes and two tutorial programmes on basic Python programming and data structures &amp; algorithms.</li>
+      <li>Managed the seminar and tutorial programmes, increasing student engagement by up to 10% over the previous year's team.</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="row"><span class="title">Staff, “Mobil Pintar” Programme · Yayasan Pondok Indah Kasih</span><span class="date">May 2025 – Jul 2025</span></div>
+    <div class="sub">Jakarta, Indonesia</div>
+    <ul>
+      <li>Taught children through the foundation's “Mobil Pintar” programme alongside other staff members.</li>
+      <li>Increased social media awareness by up to 20% through documentaries.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Skills</h2>
+  <dl class="skills">
+    <dt>LLMs &amp; Agents</dt>
+    <dd>LangGraph, RAG, LLM fine-tuning (SFT, RL, LoRA, quantisation), LLaMA-Factory, Unsloth, RLHF, RAGAS, NLP, Reinforcement Learning, Knowledge Graphs</dd>
+    <dt>ML / Deep Learning</dt>
+    <dd>PyTorch, Ultralytics, OpenCV, Hugging Face</dd>
+    <dt>Data &amp; Infrastructure</dt>
+    <dd>Python, SQL, PostgreSQL / Supabase, ChromaDB, Neo4j, FastAPI, Docker, GitHub</dd>
+    <dt>Languages</dt>
+    <dd>Bahasa Indonesia (native), English</dd>
+    <dt>Soft skills</dt>
+    <dd>Active listening · Analytical thinking · Critical thinking · Problem-solving · Teamwork · Time&nbsp;management</dd>
+  </dl>
+</section>
+
+</main>
+</body>
+</html>

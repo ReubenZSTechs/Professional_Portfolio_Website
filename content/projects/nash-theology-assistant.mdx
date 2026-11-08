@@ -1,0 +1,50 @@
+---
+title: "Nash: Theology Assistant"
+slug: nash-theology-assistant
+summary: An A.T.H.E.N.A agent for Bible study through a Reformed lens, built on self-hosted vLLM models with schema-validated agent outputs and per-call observability, designed around multi-agent debate.
+repo: https://github.com/ReubenZSTechs/Nash_Theology-Assistant
+status: in-progress
+category: agentic
+tags: [Agentic RAG, GraphRAG, Knowledge graph, Multi-agent debate, Observability, A.T.H.E.N.A]
+stack: [Python, LangGraph, vLLM, OpenAI-compatible API, xgrammar, BGE-M3, PostgreSQL 17, Neo4j, Docker]
+timeline: Oct 2026 – present
+role: Solo
+highlight: Self-hosted LLM stack with guided JSON decoding, automatic output repair and per-node latency/token tracing
+featured: false
+order: 9
+lab: true
+series: athena
+---
+
+## The problem
+
+Finding what a sermon series or a theological tradition says about a topic means hours of watching and reading, especially without theological training. Nash is the [A.T.H.E.N.A](/projects/athena) agent that answers those questions, grounded in sources and from a Reformed perspective.
+
+## How it works
+
+<Pipeline steps={["Question", "Prompt refiner", "Sub-questions + intent + entities", "Metadata-filtered RAG", "Debate: blackboard / orchestrator-workers", "Correlation check", "Answer + evaluation"]} highlight={4} />
+
+**Infrastructure (built):** models are self-hosted with **vLLM** behind an OpenAI-compatible API: a Llama 3.1 8B Instruct model for generation and **BGE-M3** for embeddings, with PostgreSQL 17 and Neo4j in the same Docker Compose stack. A shared `LLMAgent` class loads each agent's prompt and generation settings from a config file plus a JSON Schema for its output, uses **guided decoding (xgrammar)**, and automatically retries invalid JSON or truncated output. Decorators log every LLM and node call (tokens, latency, time-to-first-token, errors) for tracing and evaluation.
+
+**Reasoning design (in progress):** after the prompt is refined and broken into sub-questions, intent and entities, metadata-filtered retrieval builds the context. Depending on intent, the question gets a direct reasoned answer, a **blackboard** debate between three agents over extracted facts, or an **orchestrator-worker** split across three more agents. A correlation check (90% threshold) decides whether the agents agree or need another round.
+
+## Key decisions
+
+<Decisions>
+  <Decision title="Contracts on every agent">
+    Each agent's output is defined by a JSON Schema and enforced with guided decoding, so downstream nodes never parse free text.
+  </Decision>
+  <Decision title="Observability from day one">
+    Per-call token, latency and TTFT records make it possible to see which node is slow or expensive before optimising it.
+  </Decision>
+  <Decision title="Debate for interpretive questions">
+    Theological questions often have more than one defensible reading. Several agents arguing from the same facts, with a correlation check, surface disagreement instead of hiding it.
+  </Decision>
+</Decisions>
+
+<Todo>Add the source corpus (sermons, confessions, commentaries) and how the knowledge graph is built from it.</Todo>
+
+## What I'd do next
+
+- Finish the debate modules and evaluate faithfulness, coherence and correlation against a golden question set.
+- Fine-tune the worker models with SFT and then PPO.

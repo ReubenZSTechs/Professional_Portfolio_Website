@@ -1,0 +1,38 @@
+---
+title: Custom LLM from Scratch
+slug: custom-llm
+summary: A from-scratch language-model project covering data preparation, tokenizer, attention and transformer blocks, training, evaluation and an inference API.
+repo: https://github.com/ReubenZSTechs/CUSTOM-LLM
+status: in-progress
+category: llm
+tags: [Transformers, Pre-training, Deep learning fundamentals]
+stack: [Python, PyTorch]
+timeline: Aug 2026 – present
+role: Solo
+highlight: Building every part of a transformer language model myself, from the tokenizer to the inference API
+featured: false
+order: 15
+lab: false
+---
+
+## The problem
+
+Most of my work uses pretrained models through LangGraph, LoRA and RAG. To reason well about their failures and costs, I want to understand the layer underneath by building a small language model myself, end to end.
+
+## How it works
+
+The repository is laid out as a full training stack:
+
+<Pipeline steps={["Raw text", "Preprocess + tokenizer", "Attention + transformer", "Train", "Evaluate / benchmark", "Inference API"]} highlight={2} />
+
+- `configs/`: data, model and training configs kept separate from the code.
+- `src/data`: loader, preprocessing and tokenizer.
+- `src/model`: attention and the transformer architecture.
+- `src/evaluation`: metrics and benchmarks; `src/inference`: generation and an API.
+- `scripts/`: prepare data, train, evaluate and run inference; `notebooks/` for EDA.
+
+<Callout>Early stage: the architecture and module layout are in place and the implementation is in progress.</Callout>
+
+## What I'd do next
+
+- <Todo>Add the target model size, dataset and first training-loss curve once training starts.</Todo>

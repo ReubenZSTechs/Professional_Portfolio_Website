@@ -1,0 +1,40 @@
+---
+title: "Elena: Research Paper Knowledge Base"
+slug: elena-research-knowledge-base
+summary: The A.T.H.E.N.A agent that stores and organises research papers so they can be retrieved for future research.
+repo: https://github.com/ReubenZSTechs/Elena_Research-Paper-Knowledge-Base
+status: in-progress
+category: agentic
+tags: [Knowledge management, RAG, A.T.H.E.N.A]
+stack: [Python, LangGraph, FastAPI, Ollama, Docker]
+timeline: Oct 2026 – present
+role: Solo
+highlight: The long-term research memory for the A.T.H.E.N.A agents
+featured: false
+order: 14
+lab: false
+series: athena
+---
+
+## The problem
+
+Papers I read for one project are useful again months later, but only if I can find them and remember what they said. Elena is the [A.T.H.E.N.A](/projects/athena) agent that stores research papers and makes them retrievable for future work. It complements [Arthur](/projects/arthur-research-paper-summarizer), which summarises papers one at a time.
+
+## How it works
+
+Elena is built on the shared A.T.H.E.N.A workspace: a FastAPI + LangGraph backend with retrieval, database and pipeline modules, a frontend, and the shared LoRA → GGUF → Ollama training and serving tools.
+
+<Todo>Describe Elena's ingestion and retrieval flow (how papers are parsed, chunked, embedded and stored, and how other agents query it) once it's implemented.</Todo>
+
+## Key decisions
+
+<Decisions>
+  <Decision title="A dedicated memory agent">
+    Keeping paper storage in its own agent gives every other agent one place to ask "what do I already know about this?" instead of each keeping its own index.
+  </Decision>
+</Decisions>
+
+## What I'd do next
+
+- Store Arthur's summaries alongside the full papers, so cross-paper reports can be generated.
+- Expose a retrieval API that the other A.T.H.E.N.A agents can call.

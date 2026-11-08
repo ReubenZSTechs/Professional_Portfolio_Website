@@ -1,0 +1,50 @@
+---
+title: Calvin-GPT
+slug: calvin-gpt
+summary: "My undergraduate thesis: a research-grounded theological Q&A system that combines agentic RAG, a Graph-of-Agents and Graph-of-Thoughts reasoning, served on self-hosted models."
+repo: https://github.com/ReubenZSTechs/CALVIN-GPT
+status: in-progress
+category: research
+tags: [Agentic RAG, Graph-of-Agents, Graph-of-Thoughts, Thesis, Fine-tuning]
+stack: [Python, LangGraph, FastAPI, vLLM, Llama 3.1 8B (NVFP4), BGE-M3, LLaMA-Factory, Ollama, PostgreSQL, Docker]
+timeline: Aug 2026 – Aug 2027 (expected)
+role: Solo · undergraduate thesis
+highlight: "Thesis: Agentic RAG + Graph-of-Agents + Graph-of-Thoughts for research-grounded Q&A"
+featured: false
+order: 5
+lab: true
+---
+
+## The problem
+
+General LLMs answer theological questions fluently but often without grounding: they mix traditions, invent citations, or flatten nuanced debates into one confident answer. My thesis, *Artificial Intelligence using Agentic RAG and Graph-of-Agents with Graph-of-Thoughts Reasoning for Research-Grounded Question and Answering*, asks whether a structured multi-agent system can answer theological questions that stay faithful to the source research.
+
+## How it works
+
+<Pipeline steps={["Question", "Agentic retrieval", "Graph-of-Agents", "Graph-of-Thoughts reasoning", "Grounded answer + sources"]} highlight={2} />
+
+- **Agentic RAG**: retrieval is an agent that decides what to search for and when it has enough, instead of a single top-k lookup.
+- **Graph-of-Agents (GoA)**: specialised agents are connected as a graph that coordinates who works on which part of the question.
+- **Graph-of-Thoughts (GoT)**: each agent reasons as a graph of partial thoughts that can be merged and refined, rather than a single chain.
+
+**Built so far:** the serving and agent infrastructure. **vLLM** serves Llama 3.1 8B Instruct (NVFP4-quantised, 32k context) and **BGE-M3** embeddings behind an OpenAI-compatible API. The FastAPI backend has schema-validated agents and per-call observability (tokens, latency, errors). A training workspace with **LLaMA-Factory** and Ollama export tools is in place for fine-tuning, with a pipeline that chunks source documents and generates QA pairs for training data.
+
+## Key decisions
+
+<Decisions>
+  <Decision title="Self-hosted, quantised models">
+    NVFP4 quantisation fits an 8B model with a long context on one GPU, keeping the system reproducible for a thesis and independent of API pricing.
+  </Decision>
+  <Decision title="Structure over a bigger model">
+    The thesis tests whether better retrieval and reasoning structure (GoA + GoT) can beat simply prompting a larger model.
+  </Decision>
+</Decisions>
+
+## Results
+
+<Todo>Add the evaluation plan: dataset of questions, baselines (plain RAG, single agent), and metrics such as faithfulness, answer relevance and citation accuracy.</Todo>
+
+## What I'd do next
+
+- Complete the GoA and GoT reasoning modules and run the baseline comparison.
+- Fine-tune the worker models on the generated QA pairs with LLaMA-Factory.

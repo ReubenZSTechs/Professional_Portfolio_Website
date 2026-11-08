@@ -1,0 +1,68 @@
+---
+title: Plantatio
+slug: plantatio
+summary: AI growing intelligence for green produce. GraphRAG answers over a 2,061-triplet agronomy knowledge graph, leaf-disease diagnosis from a photo, and satellite scoring of land worth restoring.
+repo: https://github.com/ReubenZSTechs/Plantatio
+status: testing
+category: agentic
+tags: [GraphRAG, Knowledge graph, LangGraph, Computer vision, Fine-tuning, Competition winner]
+stack: [Python, LangGraph, Neo4j, FastAPI, PyTorch, ResNet-50, Qwen2.5-VL, Hugging Face, LLaMA-Factory, Unsloth, RAGAS, React 19, TanStack Start, Tailwind CSS, Docker]
+timeline: May 2026
+role: "Team"
+cover: /images/projects/plantatio.webp
+highlight: 1st place at Technofest UBM 2026, evaluated with RAGAS plus custom workflow metrics
+featured: true
+order: 3
+lab: false
+---
+
+## The problem
+
+Growing advice is scattered across research papers that home growers never read, and land-restoration teams have no quick way to see which parcels are worth restoring. Plantatio serves both: **home growers** looking after a few plants, and **restoration operators** managing land at scale.
+
+It won **1st place at Technofest UBM 2026**.
+
+## How it works
+
+<Pipeline steps={["Question", "Decompose", "Text-to-Cypher", "Neo4j subgraph", "Reason", "Answer + evidence"]} highlight={2} />
+
+A four-node LangGraph pipeline over typed state:
+
+1. **Decompose**: the LLM splits the question into sub-questions.
+2. **Retrieve**: each sub-question becomes a Cypher query against Neo4j, with the live graph schema in the prompt and a keyword fallback when the generated query finds nothing.
+3. **Reason**: step-by-step reasoning over the retrieved subgraph.
+4. **Answer**: a grower-facing reply plus the facts it came from, so every answer can be expanded to show its evidence.
+
+Next to the assistant: a **ResNet-50 leaf-disease classifier** that ranks diagnoses from a photo, a **Qwen2.5-VL** model that compares baseline and current satellite images, and a map-based console that ranks restoration parcels.
+
+<Figure src="/images/projects/plantatio-satellite-1986-2019.webp" alt="Two Landsat satellite views of the same terrain, from 1986 and 2019" caption="Satellite audit demo: the same terrain in 1986 and 2019, scored by Qwen2.5-VL for restoration potential." width={1858} height={560} />
+
+## Key decisions
+
+<Decisions>
+  <Decision title="A knowledge graph instead of plain vector RAG">
+    62 tomato-agronomy research papers were reduced to 2,061 typed subject–relation–object triplets: 10 node labels (Disease, Pest, Nutrient, Symptom, Solution and more) and 36 relationship types. A graph can answer multi-hop questions ("which nutrient deficiency causes this symptom, and what fixes it?") that chunk retrieval struggles with.
+  </Decision>
+  <Decision title="One model, four roles">
+    A single Llama 3.1 8B Instruct model serves decomposition, text-to-Cypher, reasoning and answering, each with its own decoding budget. It is loaded on first use so the API starts instantly. The LLMs were fine-tuned with SFT and RL using LoRA on LLaMA-Factory and Unsloth.
+  </Decision>
+  <Decision title="Fail honestly">
+    Every model path degrades with an explicit message. With no knowledge graph, no classifier checkpoint or unsupported hardware, the API returns a clear 503 instead of making up a diagnosis or an answer.
+  </Decision>
+</Decisions>
+
+## Results
+
+<Metrics>
+  <Metric value="1st" label="Technofest UBM 2026" />
+  <Metric value="2,061" label="Typed triplets extracted from 62 research papers" />
+  <Metric value="44" label="Automated tests covering the contracts that broke before" />
+</Metrics>
+
+Evaluated with RAGAS plus custom workflow metrics. <Todo>Add the RAGAS scores (faithfulness, answer relevance, context precision).</Todo>
+
+## What I'd do next
+
+- Extend the knowledge graph beyond tomato agronomy.
+- Connect real sensor telemetry; plants, sensors and parcels are currently seeded demo data.
+- Co-register satellite image pairs for pixel-level change detection, and add authentication to the enterprise console.

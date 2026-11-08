@@ -1,0 +1,11 @@
+eyebrow: Research · Undergraduate thesis, in progress
+title: Calvin-GPT
+subtitle: >-
+  Artificial Intelligence using Agentic RAG and Graph-of-Agents with Graph-of-Thoughts
+  Reasoning for Research-Grounded Question and Answering
+description: >-
+  A question-answering system that grounds its answers in research papers. Retrieval is
+  agentic, a Graph-of-Agents coordinates specialised agents, and each agent reasons with
+  Graph-of-Thoughts rather than a single chain.
+tags: [Agentic RAG, Graph-of-Agents (GoA), Graph-of-Thoughts (GoT)]
+project: calvin-gpt
