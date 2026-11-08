@@ -1,0 +1,52 @@
+---
+# Copy this file to content/projects/<slug>.mdx — the file name must equal `slug`.
+# Files starting with "_" are ignored by the site and the RAG index.
+# Field reference: docs/content-guide.md#project-frontmatter
+title: Project name
+slug: project-name               # kebab-case, same as the file name
+summary: One sentence on what it does and for whom.
+repo: https://github.com/ReubenZSTechs/REPO
+# demo: https://...              # optional live demo
+status: in-progress              # live | completed | testing | in-progress | archived
+category: agentic                # agentic | llm | cv | ml | research
+tags: [LangGraph, RAG]
+stack: [Python, FastAPI]
+timeline: Jan 2027 – present
+role: Solo                       # or "Team of 3 · I owned the agent logic"
+highlight: The one result a hiring manager should remember.
+# cover: /images/projects/project-name.png   # optional, 16:9
+featured: false                  # true = pinned on the homepage
+order: 50                        # lower = earlier
+lab: false                       # true = listed under "In the lab"
+# series: athena                 # optional grouping
+---
+
+## The problem
+
+Who is this for, and what was slow, expensive or painful before?
+
+## How it works
+
+<Pipeline steps={["Input", "Step 2", "Step 3", "Output"]} highlight={2} />
+
+Explain the flow in a few sentences or bullets.
+
+## Key decisions
+
+<Decisions>
+  <Decision title="Decision one">Why you chose it, and the trade-off you accepted.</Decision>
+  <Decision title="Decision two">…</Decision>
+</Decisions>
+
+## Results
+
+<Metrics>
+  <Metric value="~40%" label="What the number measures" />
+</Metrics>
+
+<Todo>Anything you still need to fill in. Shown in dev, hidden in production.</Todo>
+
+## What I'd do next
+
+- One improvement you'd make with more time.
+- One limitation you found in testing.

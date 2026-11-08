@@ -1,0 +1,68 @@
+---
+title: "Arthur: AI Research Paper Summariser & QA"
+slug: arthur-research-paper-summarizer
+summary: A multi-model LangGraph agent that turns a journal paper into a structured PDF summary, enriched with web research and checked by an evaluator before it is returned.
+repo: https://github.com/ReubenZSTechs/Arthur_AI-Research-Paper-Summarizer-And-QA
+status: in-progress
+category: llm
+tags: [LangGraph, Multi-LLM, Self-critique, LLM evaluation, A.T.H.E.N.A]
+stack: [Python, LangGraph, Ollama, Mistral-Nemo, Qwen3, Llama 3.2, DuckDuckGo Search, LLaMA-Factory, LoRA]
+timeline: Apr 2026 – present
+role: Solo
+highlight: ~40% less literature-review time in internal testing
+featured: true
+order: 1
+lab: false
+series: athena
+---
+
+## The problem
+
+Reading a long journal paper takes time, and taking notes on it doubles the effort: you read once to understand and again to summarise. For a literature review across many papers, most of that time goes into papers that turn out not to matter.
+
+Arthur is a research-summariser agent: give it a paper and it returns the key points as a formatted PDF report, enriched with context from the web. It is meant to speed up triage and note-taking, not to replace reading the papers that matter. Arthur is also the research agent of my [A.T.H.E.N.A](/projects/athena) system.
+
+## How it works
+
+<Pipeline steps={["PDF in", "Ingestion", "Understanding", "Reasoning", "Formatting", "Evaluation", "PDF report"]} highlight={3} />
+
+The LangGraph workflow runs five phases over a shared state:
+
+- **Ingestion**: load the PDF, parse it into sections, and chunk it.
+- **Understanding**: summarise each chunk, then aggregate the summaries per section.
+- **Reasoning**: detect research gaps, search the web for context (DuckDuckGo Search), synthesise the paper with that context, then self-critique and re-retrieve if needed.
+- **Formatting**: turn the synthesis into structured notes.
+- **Evaluation**: an independent model scores the output. If faithfulness is below 80%, the graph loops back to synthesis with a different prompt.
+
+## Key decisions
+
+<Decisions>
+  <Decision title="Three models, three roles">
+    Bulk work (chunk summaries, merging, retrieval, formatting) runs on a 12B worker model (Mistral-Nemo). Gap detection, synthesis and self-critique run on a 14B reasoning model (Qwen3). A separate 3B model (Llama 3.2) acts as the evaluator, so the model grading the summary isn't the one that wrote it.
+  </Decision>
+  <Decision title="Local models through Ollama">
+    Every model runs locally through Ollama, so there are no per-token API costs and papers never leave the machine. That matters when summarising large batches.
+  </Decision>
+  <Decision title="An evaluation gate, not just a final answer">
+    A faithfulness threshold decides whether the summary ships or goes back for another synthesis pass. The workflow also tracks latency per node, web calls, relevance, completeness and total runtime.
+  </Decision>
+</Decisions>
+
+Fine-tuning: according to my CV, the summariser model is fine-tuned with LoRA, quantisation, SFT and RL on LLaMA-Factory. <Todo>Describe which base model was fine-tuned, on what data, and what SFT then RL improved.</Todo>
+
+## Results
+
+<Metrics>
+  <Metric value="~40%" label="Less literature-review time in internal testing" />
+  <Metric value="80%" label="Faithfulness threshold before a summary is accepted" />
+  <Metric value="3" label="Specialised local models (worker, reasoner, evaluator)" />
+</Metrics>
+
+<Todo>Add measured faithfulness, relevance and completeness scores and the average runtime per paper, plus a screenshot of a generated PDF report as `cover:`.</Todo>
+
+## What I'd do next
+
+- Add a debater pattern to the synthesis and self-critique nodes.
+- Add a planning agent (supervisor pattern) at the start of the graph.
+- Store all reports in a vector knowledge base, so summaries can be generated across papers.
+- Turn the summariser into a chatbot with a RAG pipeline for follow-up questions.

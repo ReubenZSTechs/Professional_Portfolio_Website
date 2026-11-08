@@ -1,0 +1,60 @@
+---
+title: Retinal Disease Classification (Multimodal)
+slug: retinal-disease-classification
+summary: A multimodal model that fuses a fundus image with its clinical caption through a learned gate, predicting diabetic-retinopathy grade and risk of macular edema.
+repo: https://github.com/ReubenZSTechs/Retinal-Disease-Classification
+status: completed
+category: cv
+tags: [Multimodal learning, Medical imaging, Gated fusion, Multi-task learning]
+stack: [Python, PyTorch, torchvision, ResNet-50, scikit-learn, Streamlit]
+timeline: Completed Jan 2026
+role: Solo
+cover: /images/projects/retinal-disease-classification.webp
+highlight: Gated image-text fusion with two prediction heads, retinopathy grade and macular-edema risk
+featured: false
+order: 21
+lab: false
+---
+
+## The problem
+
+Eye screening produces two kinds of evidence: the fundus photograph and the clinician's written notes. Most models use only the image. This project asks whether combining both helps, and lets the model learn how much to trust each one.
+
+<Callout>Research and educational project only. It is not a medical device and must not be used for clinical diagnosis.</Callout>
+
+## How it works
+
+<Pipeline steps={["Fundus image → ResNet-50", "Caption → text projection", "Fusion gate", "MLP", "Grade + edema risk"]} highlight={2} />
+
+A frozen **ResNet-50** extracts image features, and a linear projection layer encodes the clinical caption. A **fusion gate** learns an adaptive weighting between the two, the fused representation passes through an MLP, and two output heads predict the **retinopathy grade** and the **risk of macular edema**. A **Streamlit** app takes an image plus its caption and returns both predictions with their confidence.
+
+<Figure src="/images/projects/retinal-disease-classification-demo.webp" alt="Streamlit app showing a fundus photograph and results: retinopathy grade normal and macular edema risk no risk" caption="Image plus clinical caption in, two predictions out." width={740} height={850} />
+
+## Key decisions
+
+<Decisions>
+  <Decision title="A learned gate, not plain concatenation">
+    Concatenating features lets the stronger modality dominate. The gate learns per-example weights, which keeps either input from taking over and shows which modality the model relied on.
+  </Decision>
+  <Decision title="One shared trunk, two heads">
+    Grade and edema risk come from the same evidence, so they share the fused representation (multi-task learning) instead of training two separate models.
+  </Decision>
+  <Decision title="A frozen backbone">
+    Freezing ResNet-50 kept training feasible on a small medical dataset and reduced overfitting.
+  </Decision>
+</Decisions>
+
+## Results
+
+<Metrics>
+  <Metric value="1.00" label="ROC-AUC, retinopathy grade (test set)" />
+  <Metric value="1.00" label="ROC-AUC, macular-edema risk (test set)" />
+</Metrics>
+
+A perfect score on a medical task is a signal to investigate, not to celebrate: the clinical captions may describe the diagnosis directly, which would let the text head read off the answer.
+
+## What I'd do next
+
+- Run image-only and caption-only ablations and audit the captions for label leakage before trusting the fused score.
+- Swap the backbone for a Vision Transformer and add Grad-CAM explanations.
+- Speed up inference and package the model with Docker for mobile use.

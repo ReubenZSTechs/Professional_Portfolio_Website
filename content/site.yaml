@@ -1,0 +1,65 @@
+# Global site settings. Edit, save, push — Vercel redeploys automatically.
+# Field reference: docs/content-guide.md#siteyaml
+
+name: Reuben Zachary Susanto
+shortName: Reuben Z. Susanto
+role: AI Engineer
+location: Jakarta, Indonesia
+timezone: WIB (UTC+7)
+
+headline: I build LLM agents, RAG pipelines and fine-tuned models.
+intro: >-
+  Final-year Computer Science student at Calvin Institute of Technology. Currently a
+  Backend AI Engineer intern at FlyRank AI, building production agents and cutting
+  their token costs.
+
+# Brand colour used for buttons, links and highlights. Mockup options:
+# #1F5EDC (blue) · #0F766E (teal) · #7C3AED (violet) · #C2410C (orange)
+accent: "#1F5EDC"
+
+availability:
+  open: true
+  label: Open to AI Engineer roles
+  details:
+    - Internships now · full-time from Aug 2027
+    - Jakarta (WIB, UTC+7) · remote or relocation
+
+links:
+  email: reuben.zachary.rz@gmail.com
+  github: https://github.com/ReubenZSTechs
+  linkedin: https://www.linkedin.com/in/reuben-zachary-susanto
+  # whatsapp: "6281234567890"   # optional: uncomment to show a WhatsApp button
+
+cv:
+  href: /cv.pdf   # put your ATS-friendly CV at public/cv.pdf
+  label: Download CV
+  fileName: Reuben-Zachary-Susanto-CV.pdf
+
+portrait:
+  src: /images/portrait.jpg
+  alt: Portrait of Reuben Zachary Susanto in a white shirt, seated in a gallery
+
+# Up to 6 headline numbers under the hero.
+highlights:
+  - { value: "3.90", label: GPA }
+  - { value: 3×, label: "Rector's List (2024–2026)" }
+  - { value: 1st, label: at Technofest UBM 2026 }
+  - { value: 15%, label: lower token cost at FlyRank AI }
+  - { value: ~40%, label: faster literature reviews }
+
+nav:
+  - { label: Ask, href: "/#ask" }
+  - { label: Work, href: "/#work" }
+  - { label: Experience, href: "/#experience" }
+  - { label: Research, href: "/#research" }
+  - { label: Contact, href: "/#contact" }
+
+footer:
+  note: Built with Next.js, FastAPI, LangGraph, Gemini and Supabase. Hosted on Vercel.
+
+seo:
+  title: Reuben Zachary Susanto · AI Engineer
+  description: >-
+    AI Engineer in Jakarta building LLM agents, RAG pipelines and fine-tuned models.
+    Case studies, experience and an AI assistant that answers questions about my work.
+  keywords: [AI Engineer, Agentic AI, LangGraph, RAG, LLM, Jakarta, Indonesia]

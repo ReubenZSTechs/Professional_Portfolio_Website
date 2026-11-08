@@ -1,0 +1,65 @@
+# Secrets: never commit real keys. Copy .env.example to .env and fill it in.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+next-env.d.ts
+*.tsbuildinfo
+.eslintcache
+.turbo/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vercel CLI link data (project/org ids) — created by `vercel link`
+.vercel/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# Supabase CLI local state (migrations in supabase/migrations ARE committed)
+supabase/.temp/
+supabase/.branches/
+.supabase/
+
+# Logs & scratch
+*.log
+logs/
+tmp/
+.cache/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json

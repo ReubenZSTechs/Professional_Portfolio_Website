@@ -1,0 +1,219 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Dark mode follows data-theme on <html> (set before paint by the script in layout.tsx). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Design tokens. Every colour in the UI comes from these variables, so a theme
+ * change happens here only. `--accent` is injected from content/site.yaml.
+ * See docs/design-system.md.
+ */
+:root {
+  --bg: #ffffff;
+  --surface: #f6f7f9;
+  --surface-raised: #fafbfc;
+  --chip: #eef2f7;
+  --ink: #0b1220;
+  --body: #334155;
+  --muted: #4a5568;
+  --line: #e4e7ec;
+  --line-strong: #cbd2dc;
+  --inverse-bg: #0b1220;
+  --inverse-surface: #111a2e;
+  --inverse-ink: #ffffff;
+  --inverse-muted: #cbd2dc;
+  --inverse-line: #334155;
+  /* --accent-base is set on <html> from content/site.yaml → accent */
+  --accent: var(--accent-base, #1f5edc);
+  --accent-strong: color-mix(in oklab, var(--accent) 80%, black);
+  --accent-soft: color-mix(in oklab, var(--accent) 10%, white);
+  --success-bg: #dcfce7;
+  --success-ink: #166534;
+  --warning-bg: #fef3c7;
+  --warning-ink: #92400e;
+  --shadow-card: 0 12px 40px rgb(11 18 32 / 0.06);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #0f1729;
+  --surface-raised: #111a2e;
+  --chip: #1b2540;
+  --ink: #f1f5f9;
+  --body: #cbd5e1;
+  --muted: #94a3b8;
+  --line: #1e293b;
+  --line-strong: #334155;
+  --inverse-bg: #111a2e;
+  --inverse-surface: #0b1220;
+  --inverse-ink: #f1f5f9;
+  --inverse-muted: #94a3b8;
+  --inverse-line: #334155;
+  --accent: color-mix(in oklab, var(--accent-base, #1f5edc) 70%, white);
+  --accent-strong: color-mix(in oklab, var(--accent) 85%, white);
+  --accent-soft: color-mix(in oklab, var(--accent) 18%, #0b1220);
+  --success-bg: #14532d;
+  --success-ink: #bbf7d0;
+  --warning-bg: #451a03;
+  --warning-ink: #fde68a;
+  --shadow-card: 0 12px 40px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-chip: var(--chip);
+  --color-ink: var(--ink);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-inverse-bg: var(--inverse-bg);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-ink: var(--inverse-ink);
+  --color-inverse-muted: var(--inverse-muted);
+  --color-inverse-line: var(--inverse-line);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-success-bg: var(--success-bg);
+  --color-success-ink: var(--success-ink);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-ink: var(--warning-ink);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-inter), ui-sans-serif, sans-serif;
+  --shadow-card: var(--shadow-card);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem; /* keep anchors clear of the sticky header */
+  }
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  a {
+    @apply text-accent underline-offset-4 transition-colors hover:text-accent-strong;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  ::selection {
+    background: var(--accent-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out both;
+}
+
+/* ------------------------------------------------------------- scroll reveal */
+/* Hidden only when JS is running (html.js), so no-JS visitors and crawlers see everything. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0ms),
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+/* Entering from the top (visitor scrolling up): start above and drop into place. */
+.js .reveal[data-from="above"] {
+  transform: translateY(-16px);
+}
+.js .reveal[data-revealed] {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal,
+  .js .reveal[data-from] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ----------------------------------------------------------- glass + backdrop */
+/* Used sparingly (header, hero card, chat, stats). Ordinary cards stay solid for legibility. */
+.glass {
+  background: color-mix(in oklab, var(--bg) 72%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid color-mix(in oklab, var(--line-strong) 70%, transparent);
+}
+/* The sticky header sits over busy content, so it needs to be more opaque. */
+.glass-strong {
+  background: color-mix(in oklab, var(--bg) 93%, transparent);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-bottom: 1px solid var(--line);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--bg);
+  }
+}
+
+/* Soft accent-tinted gradient mesh behind the hero and the Ask section. */
+.backdrop-mesh {
+  position: relative;
+  isolation: isolate;
+}
+.backdrop-mesh::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40rem 28rem at 85% 10%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(32rem 24rem at 5% 85%, color-mix(in oklab, #14b8a6 12%, transparent), transparent 70%),
+    radial-gradient(28rem 20rem at 55% 100%, color-mix(in oklab, #8b5cf6 9%, transparent), transparent 70%);
+}
+[data-theme="dark"] .backdrop-mesh::before {
+  opacity: 0.8;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.caret::after {
+  content: "▍";
+  margin-left: 2px;
+  animation: blink 1s steps(1) infinite;
+  color: var(--accent);
+}

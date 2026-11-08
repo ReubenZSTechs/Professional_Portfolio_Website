@@ -1,0 +1,48 @@
+---
+title: "Tasya: Personal Finance AI Agent"
+slug: tasya-personal-finance-agent
+summary: An A.T.H.E.N.A agent for budgeting, spending analysis and money questions, combining RAG with models fine-tuned using RLHF, all run locally.
+repo: https://github.com/ReubenZSTechs/Tasya_Personal-Finance-AI-Agent
+status: in-progress
+category: agentic
+tags: [Agentic AI, RAG, RLHF, Fine-tuning, A.T.H.E.N.A]
+stack: [Python, LangGraph, FastAPI, PyTorch, Transformers, PEFT (LoRA), Ollama, Streamlit, Docker]
+timeline: Sep 2026 – present
+role: Solo
+highlight: ~10% wealth improvement in backtesting simulation, on private local models
+featured: false
+order: 11
+lab: true
+series: athena
+---
+
+## The problem
+
+Budgeting apps show charts, but they don't answer "can I afford this?" or explain where the money went. And most people would rather not send their bank statements to a hosted LLM. Tasya is the finance agent in [A.T.H.E.N.A](/projects/athena): budgeting, analysis and Q&A on your own data, running on local models.
+
+## How it works
+
+Tasya is built on the shared A.T.H.E.N.A workspace: a FastAPI + LangGraph backend, a Streamlit frontend, and training tools that fine-tune models with PEFT/LoRA, then merge and export them to GGUF for serving through Ollama. Answers combine **RAG** over the user's financial records and finance references with a model tuned using **RLHF**.
+
+<Todo>Describe the graph (e.g. categorise transactions → analyse → answer), the data sources, and what RLHF improved.</Todo>
+
+## Key decisions
+
+<Decisions>
+  <Decision title="Local models for private data">
+    Financial data is sensitive, so the models are fine-tuned and served locally through Ollama instead of a hosted API.
+  </Decision>
+  <Decision title="RAG plus preference tuning">
+    RAG keeps answers tied to the user's real numbers, and RLHF tunes the tone and caution of the advice.
+  </Decision>
+</Decisions>
+
+## Results
+
+<Metrics>
+  <Metric value="~10%" label="Improvement in financial wealth in a backtesting simulation" />
+</Metrics>
+
+## What I'd do next
+
+- <Todo>Add the first evaluation results and one limitation found so far.</Todo>

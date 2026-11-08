@@ -1,0 +1,59 @@
+---
+title: Smart Traffic Incident Detection
+slug: smart-traffic-incident-detection
+summary: A hybrid CNN-sequence model that watches highway CCTV footage, flags accidents, and reports when they happened.
+repo: https://github.com/ReubenZSTechs/Smart-Traffic-Incident-Detection
+status: completed
+category: cv
+tags: [Computer vision, Video classification, Anomaly detection, Model comparison]
+stack: [Python, PyTorch, torchvision, ResNet-18, LSTM, Transformer, Hugging Face Hub, Streamlit]
+timeline: Completed Apr 2026
+role: Solo
+cover: /images/projects/smart-traffic-incident-detection.webp
+highlight: CNN-LSTM reached 0.847 ROC-AUC, against 0.506 for a CNN-Transformer baseline
+featured: false
+order: 20
+lab: false
+---
+
+## The problem
+
+Traffic operators watch many CCTV feeds at once, so an accident on one camera can go unnoticed for minutes. Every minute counts for emergency response. This project automatically flags highway footage that contains an incident and reports the timestamp, so a human only has to review the flagged clips.
+
+## How it works
+
+<Pipeline steps={["CCTV video", "ResNet-18 frame features", "LSTM / Transformer", "MLP head", "Incident + timestamp"]} highlight={2} />
+
+Each frame goes through a **ResNet-18** feature extractor. A sequence model (**LSTM** in one variant, **Transformer** encoder in the other) models how those features change over time, and an MLP head outputs logits, probability and prediction. A **Streamlit** app accepts an uploaded video, processes it, and shows whether there is an accident and when.
+
+<Figure src="/images/projects/smart-traffic-incident-detection-demo.webp" alt="Streamlit app with highway CCTV footage and the result: Accident Detected, occurred at 5.34 seconds" caption="Upload a clip, get a verdict and the time of the incident." width={740} height={830} />
+
+Trained on the NVIDIA AI City Challenge 2021 (Track 4) highway footage, with early stopping and a fixed train/validation/test split. The model weights are published on Hugging Face (`ReubenZS/CNN_LSTM_Smart_Traffic_Incident_Detector`).
+
+## Key decisions
+
+<Decisions>
+  <Decision title="A CNN for space, a sequence model for time">
+    A single frame rarely shows an accident unambiguously; the motion across frames does. A pretrained CNN handles spatial features cheaply, and the sequence model learns the temporal pattern.
+  </Decision>
+  <Decision title="Weighted training for rare events">
+    Accident footage is a small minority of the data, so accident-labelled clips were weighted up during training to stop the model from simply predicting "no incident".
+  </Decision>
+  <Decision title="Compare architectures before picking one">
+    LSTM and Transformer heads were trained and evaluated side by side on the same features and splits, and the better one was deployed.
+  </Decision>
+</Decisions>
+
+## Results
+
+<Metrics>
+  <Metric value="0.847" label="ROC-AUC, CNN-LSTM (deployed)" />
+  <Metric value="0.506" label="ROC-AUC, CNN-Transformer (near chance)" />
+</Metrics>
+
+The Transformer variant barely beat chance on this dataset size, while the LSTM learned a useful signal. That was a useful reminder that the more fashionable architecture isn't always the right one for limited data.
+
+## What I'd do next
+
+- Train for more epochs with more compute.
+- Ship a lighter model for faster inference, packaged with Docker for mobile or edge deployment.

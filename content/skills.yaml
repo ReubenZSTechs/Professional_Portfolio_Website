@@ -1,0 +1,8 @@
+- group: LLMs & agents
+  items: [LangGraph, Agentic RAG, Multi-agent systems, Tool calling, Prompt engineering, Knowledge graphs, NLP]
+- group: Training & evaluation
+  items: [Fine-tuning (LoRA, SFT), Reinforcement learning, LLaMA-Factory, Unsloth, RAGAS, PyTorch, Hugging Face]
+- group: Computer vision
+  items: [Ultralytics YOLO, OpenCV, CNNs, Roboflow]
+- group: Data & infrastructure
+  items: [Python, SQL, FastAPI, ChromaDB, Neo4j, Supabase / pgvector, Docker, AWS]

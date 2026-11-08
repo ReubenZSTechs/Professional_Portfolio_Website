@@ -1,0 +1,59 @@
+---
+title: Brain Tumour MRI Classification
+slug: brain-tumor-classification
+summary: A custom CNN, tuned with random hyperparameter search, that classifies brain MRI scans into glioma, meningioma, pituitary tumour or no tumour.
+repo: https://github.com/ReubenZSTechs/Brain-Tumor-Classification
+status: completed
+category: cv
+tags: [Computer vision, Medical imaging, Hyperparameter tuning, Multi-class classification]
+stack: [Python, PyTorch, torchvision, skorch, scikit-learn, Streamlit]
+timeline: Completed Jan 2026
+role: Solo
+cover: /images/projects/brain-tumor-classification.webp
+highlight: ROC-AUC between 0.91 and 0.99 across all four classes with a custom CNN
+featured: false
+order: 22
+lab: false
+---
+
+## The problem
+
+Reading brain MRI scans takes specialist time, and a first-pass classifier can help prioritise which scans need attention. This project builds that classifier from scratch, as a learning exercise in designing and tuning a CNN rather than relying on a pretrained backbone.
+
+<Callout>Research and educational project only. It is not a medical device and must not be used for clinical diagnosis.</Callout>
+
+## How it works
+
+<Pipeline steps={["MRI scan", "Custom CNN features", "MLP head", "Tumour class + confidence"]} highlight={1} />
+
+A custom convolutional feature extractor feeds an MLP classification head that predicts one of four classes. The workflow: curate the dataset into train/validation/test CSVs, explore the data, train a baseline, run a random hyperparameter search, retrain with the best parameters, then evaluate on the held-out test set. A **Streamlit** app takes an uploaded scan and returns the predicted class with a confidence score.
+
+<Figure src="/images/projects/brain-tumor-classification-demo.webp" alt="Streamlit app showing an MRI scan, the prediction No tumor, and confidence scores for each class" caption="Prediction with per-class confidence scores." width={740} height={860} />
+
+## Key decisions
+
+<Decisions>
+  <Decision title="A custom CNN instead of transfer learning">
+    Building the feature extractor from scratch made the effect of each architecture and training choice visible, which was the point of the project.
+  </Decision>
+  <Decision title="Systematic tuning with skorch">
+    Wrapping the PyTorch model with skorch made scikit-learn's random search available. Hyperparameters were tuned systematically instead of by hand.
+  </Decision>
+</Decisions>
+
+## Results
+
+<Metrics>
+  <Metric value="0.992" label="ROC-AUC, no tumour" />
+  <Metric value="0.989" label="ROC-AUC, pituitary" />
+  <Metric value="0.977" label="ROC-AUC, glioma" />
+  <Metric value="0.914" label="ROC-AUC, meningioma" />
+</Metrics>
+
+Meningioma is the hardest class to separate, which is where a deeper model would help most.
+
+## What I'd do next
+
+- Compare against a deeper backbone such as ResNet-50.
+- Try a deeper MLP head with regularisation to avoid overfitting.
+- Package the model with Docker for mobile deployment.

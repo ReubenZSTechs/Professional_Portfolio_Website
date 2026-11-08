@@ -1,0 +1,3 @@
+# Add certificates here, newest first. The section hides itself while this list is empty.
+# - { name: "TensorFlow Developer Certificate", issuer: Google, year: "2026", url: "https://..." }
+[]

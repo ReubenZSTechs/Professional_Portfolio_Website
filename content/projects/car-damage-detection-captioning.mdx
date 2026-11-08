@@ -1,0 +1,64 @@
+---
+title: Car Damage Detection & Captioning
+slug: car-damage-detection-captioning
+summary: A multi-stage computer-vision system that checks whether a car is damaged, localises the damage, estimates its severity and writes a plain-language caption from a single photo.
+repo: https://github.com/ReubenZSTechs/Car-Damage-Classification-Detection-And-Captioning
+status: completed
+category: cv
+tags: [Computer vision, Object detection, Image captioning, Multi-stage inference]
+stack: [Python, PyTorch, torchvision, ResNet-50, Ultralytics YOLOv8, ViT + GPT-2, Hugging Face Transformers, OpenCV, Roboflow, Streamlit]
+timeline: Nov – Dec 2025
+role: Solo
+cover: /images/projects/car-damage-detection-captioning.webp
+highlight: +9% accuracy and +3% precision over the baseline; 91.3% damage-classification accuracy
+featured: true
+order: 4
+lab: false
+---
+
+## The problem
+
+Assessing vehicle damage, for insurance claims, rentals or used-car inspections, usually means a person studying photos and writing a description by hand. That is slow and inconsistent between assessors. This project answers four questions from one photo: is the car damaged, where, how badly, and how would you describe it?
+
+## How it works
+
+<Pipeline steps={["Car photo", "ResNet-50: damaged?", "YOLOv8: location", "YOLOv8: severity", "ViT + GPT-2 caption", "Streamlit result"]} highlight={1} />
+
+1. A custom **ResNet-50 classifier** decides whether the car is damaged.
+2. If it is, two fine-tuned **YOLOv8** models run: one localises the damage (front, back, rear-left, rear-right) and one rates its severity (low, medium, high), each with bounding boxes.
+3. A **ViT encoder + GPT-2 decoder** writes a caption describing the car.
+4. All four models are combined into one inference pipeline behind a **Streamlit** app, with an optional CUDA toggle.
+
+<Figure src="/images/projects/car-damage-detection-captioning-demo.webp" alt="Streamlit app showing a damaged car with a front-damage bounding box and the results: damaged, probability 1.00, severity high, and a generated caption" caption="The Streamlit demo: detection boxes, severity and the generated caption for one photo." width={740} height={690} />
+
+The dataset was curated from three public sources (1,000+ images) and relabelled in Roboflow, with scripts that split it into train/validation/test and convert labels to YOLO format.
+
+## Key decisions
+
+<Decisions>
+  <Decision title="Gate the expensive models">
+    The cheap classifier runs first. The two detectors only run when there is damage, which saves compute on undamaged cars and avoids false-positive boxes.
+  </Decision>
+  <Decision title="Separate detectors for location and severity">
+    Location and severity are different labelling problems, so each got its own YOLOv8 model instead of one detector with combined classes.
+  </Decision>
+  <Decision title="Captioning as its own stage">
+    An encoder-decoder captioner (ViT + GPT-2) turns the visual result into text a non-expert can read, which is the output an assessor actually needs.
+  </Decision>
+</Decisions>
+
+## Results
+
+<Metrics>
+  <Metric value="91.3%" label="Damaged vs undamaged accuracy (ResNet-50)" />
+  <Metric value="97.1%" label="ROC-AUC, damaged vs undamaged" />
+  <Metric value="+9% / +3%" label="Accuracy / precision over the baseline" />
+</Metrics>
+
+PR-AUC for the classifier is 97.49%. The detectors are the weak point: mAP50-95 ranges from 0.04 to 0.15 for location and 0.03 to 0.20 for severity, and the captioner reached a test loss of 1.075. That is why the next steps focus on detection.
+
+## What I'd do next
+
+- Replace YOLOv8 with a stronger detector and collect more labelled damage data for localisation and severity.
+- Fine-tune a BLIP captioning model for richer, damage-aware captions.
+- Speed up model loading and package the pipeline in Docker for mobile inference.

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PromptRewriterOutput",
+  "description": "Structured output of the rewrite_query node (the prompt-rewriter agent).",
+  "type": "object",
+  "properties": {
+    "standalone_query": {
+      "type": "string",
+      "description": "Self-contained English search query with references resolved and typos repaired."
+    },
+    "intent": {
+      "type": "string",
+      "enum": ["portfolio_question", "greeting", "off_topic", "unsafe"],
+      "description": "What kind of message this is."
+    },
+    "needs_retrieval": {
+      "type": "boolean",
+      "description": "True when answering requires facts from Reuben's documents."
+    },
+    "language": {
+      "type": "string",
+      "description": "ISO 639-1 code of the visitor's language, e.g. en or id."
+    }
+  },
+  "required": ["standalone_query", "intent", "needs_retrieval", "language"],
+  "additionalProperties": false
+}

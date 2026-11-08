@@ -1,0 +1,67 @@
+---
+title: A.T.H.E.N.A
+slug: athena
+summary: My personal multi-agent system of six specialised agents for research, finance, careers, knowledge management, theology and daily life, all built on one shared platform for local LLM serving and fine-tuning.
+repo: https://github.com/ReubenZSTechs/A.T.H.E.N.A
+status: in-progress
+category: agentic
+tags: [Multi-agent systems, LangGraph, Local LLMs, Fine-tuning, Platform engineering]
+stack: [Python, LangGraph, FastAPI, Ollama, vLLM, LoRA, llama.cpp (GGUF), Docker, nginx, ngrok]
+timeline: Oct 2026 – present
+role: Solo
+highlight: Six specialised agents on one shared platform; five built so far
+featured: false
+order: 10
+lab: true
+series: athena
+---
+
+## The problem
+
+General-purpose chatbots are good at everything and expert at nothing. I wanted assistants that each do one job well, run on my own hardware, and share infrastructure so a new agent doesn't mean rebuilding the stack.
+
+A.T.H.E.N.A is the umbrella for six agents, each with its own repository:
+
+| Agent | Role |
+|---|---|
+| [**Arthur**](/projects/arthur-research-paper-summarizer) | Research-paper summariser and Q&A |
+| [**Tasya**](/projects/tasya-personal-finance-agent) | Personal finance: budgeting, analysis, Q&A |
+| **Harper** | Career and opportunity hunter: searches and filters jobs for a user persona |
+| [**Elena**](/projects/elena-research-knowledge-base) | Research-paper knowledge base for future research |
+| [**Nash**](/projects/nash-theology-assistant) | Theology assistant (Reformed perspective) |
+| **Alena** | Daily-life assistant and day planner |
+
+## How it works
+
+<Pipeline steps={["Agent repo from shared template", "Backend (FastAPI + LangGraph)", "Fine-tune (LoRA)", "Merge → GGUF → Ollama", "Docker + nginx deploy"]} highlight={3} />
+
+Every agent starts from the same workspace template: `backend/` (API, core, services, pipelines, retrieval, models, database, configs), `frontend/`, `training/` and `deployment/`. The shared training utilities take a LoRA adapter through the whole path to local serving: **merge the adapter → convert to GGUF with llama.cpp → generate a Modelfile → register and verify the model in Ollama**. Deployment is containerised: backend, frontend and Ollama behind nginx, with ngrok for remote access and scripts to start, stop, rebuild and deploy.
+
+## Key decisions
+
+<Decisions>
+  <Decision title="One template, many agents">
+    A shared folder structure and deployment stack means each new agent only adds its own graph, prompts and data, so platform fixes reach every agent.
+  </Decision>
+  <Decision title="Local-first models">
+    Fine-tuned models are exported to GGUF and served through Ollama, or through vLLM on agents that need structured decoding. Personal data such as finances never leaves my machine, and there are no per-token costs.
+  </Decision>
+  <Decision title="Specialists over a generalist">
+    Each agent gets a narrow role, its own retrieval sources and its own evaluation. That's easier to test and improve than one model that does everything.
+  </Decision>
+</Decisions>
+
+## Results
+
+<Metrics>
+  <Metric value="6" label="Specialised agents planned" />
+  <Metric value="5" label="Agents built so far" />
+</Metrics>
+
+<Todo>Add which five agents are working end to end and how the agents will hand tasks to each other (router or supervisor).</Todo>
+
+## What I'd do next
+
+- Add a supervisor agent that routes a request to the right specialist.
+- Give the agents shared long-term memory, with Elena as the knowledge store.
+- Build the sixth agent and a single chat interface across all of them.

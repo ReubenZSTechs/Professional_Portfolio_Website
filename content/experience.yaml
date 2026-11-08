@@ -1,0 +1,22 @@
+# Newest first.
+- company: FlyRank AI
+  role: Backend AI Engineer
+  type: Internship
+  start: Jun 2026
+  end: Present
+  bullets:
+    - Implemented AI-driven workflow automation tools, improving team productivity by 25%.
+    - Developed production-grade AI agents, reducing token costs by 15% through workflow and prompt optimisation.
+  tags: [AI agents, Prompt optimisation, Workflow automation]
+
+- company: Calvin Institute of Technology
+  role: AI Research Intern
+  type: Internship
+  start: Jun 2026
+  end: Aug 2026
+  location: Jakarta
+  bullets:
+    - Developed LLM-based agentic orchestration systems for a question-answering workflow.
+    - Evaluated AI systems with task-specific metrics.
+    - Optimised AI workflows and token usage by up to 20% for production deployment.
+  tags: [LangGraph, Agent orchestration, LLM evaluation]
