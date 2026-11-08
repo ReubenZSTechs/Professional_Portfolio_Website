@@ -6,6 +6,10 @@ on:
   push:
     branches: [main]
 
+# Read-only token: these jobs only check out and test code.
+permissions:
+  contents: read
+
 jobs:
   web:
     name: Frontend (typecheck, lint, build)
@@ -17,6 +21,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Runtime dependencies only (what ships to Vercel); fails on high or critical advisories.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
       - run: npm run typecheck
       - run: npm run lint
       # Building also validates every YAML/MDX file in /content against src/lib/schemas.ts.
@@ -31,7 +38,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -r requirements.txt pytest pytest-asyncio ruff
+      - run: pip install -r requirements.txt pytest pytest-asyncio ruff pip-audit
+      # Checks the pinned runtime requirements against PyPI/OSV advisories; any finding fails the job.
+      - name: Audit Python dependencies
+        run: pip-audit -r requirements.txt
       - run: ruff check backend api
         working-directory: .
       - run: python -m pytest -q

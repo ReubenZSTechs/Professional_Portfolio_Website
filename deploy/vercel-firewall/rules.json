@@ -1,0 +1,97 @@
+[
+  {
+    "name": "Rate limit chat API",
+    "description": "POST /api/py/chat: max 30 requests per 60 s per client IP, then deny. Caps LLM cost from one abusive client; a real visitor chats far below this.",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          { "type": "path", "op": "eq", "value": "/api/py/chat" },
+          { "type": "method", "op": "eq", "value": "POST" }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 60,
+          "limit": 30,
+          "keys": ["ip"],
+          "action": "deny"
+        },
+        "actionDuration": null
+      }
+    }
+  },
+  {
+    "name": "Rate limit contact API",
+    "description": "POST /api/py/contact: max 5 requests per 600 s per client IP, then deny. Stops contact-form spam and mailbox flooding.",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          { "type": "path", "op": "eq", "value": "/api/py/contact" },
+          { "type": "method", "op": "eq", "value": "POST" }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "rate_limit",
+        "rateLimit": {
+          "algo": "fixed_window",
+          "window": 600,
+          "limit": 5,
+          "keys": ["ip"],
+          "action": "deny"
+        },
+        "actionDuration": null
+      }
+    }
+  },
+  {
+    "name": "Block scanner paths",
+    "description": "Deny common vulnerability-scanner probes (/.env, /.git, /wp-*, *.php, /admin, /phpmyadmin). None of these exist on this Next.js site.",
+    "active": true,
+    "conditionGroup": [
+      { "conditions": [{ "type": "path", "op": "pre", "value": "/.env" }] },
+      { "conditions": [{ "type": "path", "op": "pre", "value": "/.git" }] },
+      { "conditions": [{ "type": "path", "op": "pre", "value": "/wp-" }] },
+      { "conditions": [{ "type": "path", "op": "suf", "value": ".php" }] },
+      { "conditions": [{ "type": "path", "op": "pre", "value": "/admin" }] },
+      { "conditions": [{ "type": "path", "op": "pre", "value": "/phpmyadmin" }] }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "deny",
+        "actionDuration": null
+      }
+    }
+  },
+  {
+    "name": "Block unexpected API methods",
+    "description": "Deny any method other than GET, HEAD, POST or OPTIONS on /api/*. The API only serves GET /health and POST chat/contact; OPTIONS stays open for CORS preflight.",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          { "type": "path", "op": "pre", "value": "/api/" },
+          {
+            "type": "method",
+            "op": "inc",
+            "value": ["GET", "HEAD", "POST", "OPTIONS"],
+            "neg": true
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "deny",
+        "actionDuration": null
+      }
+    }
+  }
+]

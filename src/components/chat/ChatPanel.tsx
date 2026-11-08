@@ -5,6 +5,7 @@ import clsx from "clsx";
 import type { ChatStage, Source } from "@/lib/api";
 import { ArrowIcon } from "@/components/ui";
 import { AnswerText } from "./AnswerText";
+import { useTurnstile } from "@/components/security/useTurnstile";
 import { useChat, type ChatMessage } from "./useChat";
 
 const MAX_CHARS = 500; // matches MAX_QUESTION_CHARS on the backend
@@ -88,7 +89,8 @@ function SourcesPanel({ message }: { message?: ChatMessage }) {
 }
 
 export function ChatPanel({ suggestions }: { suggestions: string[] }) {
-  const { messages, stage, busy, ask, stop, reset } = useChat();
+  const turnstile = useTurnstile("chat");
+  const { messages, stage, busy, ask, stop, reset } = useChat(turnstile.getToken);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
@@ -147,6 +149,8 @@ export function ChatPanel({ suggestions }: { suggestions: string[] }) {
           </div>
         )}
 
+        {/* Shown only if Cloudflare needs a one-click check; invisible otherwise. */}
+        <div className="px-5 sm:px-7">{turnstile.slot}</div>
         <form onSubmit={submit} className="flex gap-2.5 border-t border-line px-5 pt-4 pb-5 sm:px-7">
           <label htmlFor="ask-input" className="sr-only">
             Ask a question about Reuben

@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from agent.routes import chat, contact, health
 from core.config import get_settings
 from core.logging import configure_logging
+from core.security import SecurityMiddleware
 
 PREFIX = "/api/py"
 
@@ -29,8 +30,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type", "Accept"],
+    allow_headers=["Content-Type", "Accept", "X-Chat-Session"],
 )
+# Added last so it runs first: rejects oversized, non-JSON and cross-site POSTs before any
+# route code, and adds security headers to every response (docs/security.md).
+app.add_middleware(SecurityMiddleware)
 
 
 @app.exception_handler(RequestValidationError)

@@ -27,6 +27,9 @@ npm run dev:all          # http://localhost:3000
 ## Editing content
 Everything on the site comes from **`content/`**: `site.yaml` (headline, links, colour), `home.yaml` (section order), YAML files for experience, education and skills, and one MDX file per project in `content/projects/`. Edit, push to `main`, and Vercel redeploys while GitHub Actions re-indexes the assistant. Full guide: [docs/content-guide.md](docs/content-guide.md).
 
+## Security
+Layered protection for a public LLM app: Vercel Firewall rules, CSP/HSTS headers, Origin and size checks, Cloudflare Turnstile, per-visitor and site-wide (500/day) limits, and chatbot guardrails (signed history, English/Indonesian injection screening, spotlighted prompts, Gemini safety filters, canary-based leak detection), with a live red-team eval suite. See [docs/security.md](docs/security.md) and [SECURITY.md](SECURITY.md).
+
 ## Documentation
 | | |
 |---|---|

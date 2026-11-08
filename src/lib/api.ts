@@ -4,7 +4,9 @@
  */
 
 export type ChatRole = "user" | "assistant";
-export type ChatTurn = { role: ChatRole; content: string };
+/** `sig` is the server's signature on an assistant answer; unsigned assistant turns are dropped
+ * server-side, so forged history can't steer the bot (docs/security.md). */
+export type ChatTurn = { role: ChatRole; content: string; sig?: string };
 
 export type Source = {
   /** Citation number used in the answer text, e.g. [1]. */
@@ -22,13 +24,17 @@ export type ChatEvent =
   | { event: "status"; data: { stage: ChatStage } }
   | { event: "token"; data: { text: string } }
   | { event: "sources"; data: { sources: Source[] } }
+  | { event: "retract"; data: { text: string } }
+  | { event: "session"; data: { token: string } }
   | { event: "error"; data: { message: string; code?: string } }
-  | { event: "done"; data: Record<string, never> };
+  | { event: "done"; data: { sig?: string } };
 
 export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
+    /** Machine-readable reason from the X-Error-Code header, e.g. "verification", "quota". */
+    public code?: string,
   ) {
     super(message);
   }
@@ -76,30 +82,50 @@ async function* readEvents(body: ReadableStream<Uint8Array>): AsyncGenerator<Cha
   }
 }
 
+async function apiError(res: Response): Promise<ApiError> {
+  return new ApiError(await errorMessage(res), res.status, res.headers.get("X-Error-Code") ?? undefined);
+}
+
+export type ChatAuth = {
+  /** Fresh Cloudflare Turnstile token (only needed when there's no valid session). */
+  turnstileToken?: string | null;
+  /** Signed chat-session token from an earlier `session` event. */
+  sessionToken?: string | null;
+};
+
 export async function* streamChat(
   message: string,
   history: ChatTurn[],
+  auth: ChatAuth = {},
   signal?: AbortSignal,
 ): AsyncGenerator<ChatEvent> {
+  const headers: Record<string, string> = { "Content-Type": "application/json", Accept: "text/event-stream" };
+  if (auth.sessionToken) headers["X-Chat-Session"] = auth.sessionToken;
   const res = await fetch(`${API_BASE}/chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
-    body: JSON.stringify({ message, history }),
+    headers,
+    body: JSON.stringify({ message, history, turnstile_token: auth.turnstileToken ?? null }),
     signal,
   });
-  if (!res.ok || !res.body) throw new ApiError(await errorMessage(res), res.status);
+  if (!res.ok || !res.body) throw await apiError(res);
   yield* readEvents(res.body);
 }
 
-export type ContactPayload = { name: string; email: string; message: string; company?: string };
+export type ContactPayload = {
+  name: string;
+  email: string;
+  message: string;
+  company?: string;
+  turnstileToken?: string | null;
+};
 
-export async function sendContact(payload: ContactPayload): Promise<void> {
+export async function sendContact({ turnstileToken, ...payload }: ContactPayload): Promise<void> {
   const res = await fetch(`${API_BASE}/contact`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...payload, turnstile_token: turnstileToken ?? null }),
   });
-  if (!res.ok) throw new ApiError(await errorMessage(res), res.status);
+  if (!res.ok) throw await apiError(res);
 }
 
 type Health = { configured: Record<string, boolean> };
@@ -122,7 +148,8 @@ export async function explainChatFailure(fallback: string): Promise<string> {
   }
   const health = (await res.json()) as Health;
   const missing = Object.entries(health.configured)
-    .filter(([name, ok]) => !ok && name !== "resend")
+    // Only these are required for the chat locally; Resend and Turnstile are optional in dev.
+    .filter(([name, ok]) => !ok && (name === "gemini" || name === "supabase"))
     .map(([name]) => name);
   if (missing.length) {
     return `Dev: ${missing.join(" and ")} ${missing.length > 1 ? "aren't" : "isn't"} configured. Fill in .env (see .env.example) and restart \`npm run dev:all\`.`;

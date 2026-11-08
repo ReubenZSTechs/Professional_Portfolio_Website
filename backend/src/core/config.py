@@ -79,10 +79,31 @@ class Settings(BaseSettings):
     # --- Chat guardrails ---
     max_question_chars: int = Field(default=500, ge=1)
     max_history_turns: int = Field(default=10, ge=0)
+    max_turn_chars: int = Field(default=2000, ge=100)
+
+    # --- Request hardening (docs/security.md) ---
+    # Largest accepted request body. Chat/contact payloads are a few KB at most.
+    max_body_bytes: int = Field(default=64 * 1024, ge=1024)
+    # Extra browser origins allowed to POST (comma-separated). Same-origin requests, the
+    # NEXT_PUBLIC_SITE_URL and this project's Vercel URLs are always allowed.
+    allowed_origins: Annotated[list[str], NoDecode] = []
+    # Preview deployments: https://<project>-<hash>-<team>.vercel.app
+    allowed_origin_regex: str = r"^https://[a-z0-9-]+-reubenzstechs\.vercel\.app$"
+    next_public_site_url: str | None = None
+
+    # --- Bot protection: Cloudflare Turnstile + signed chat sessions ---
+    turnstile_secret_key: SecretStr | None = None
+    # HMAC key for chat session tokens and signed assistant answers. Required when deployed.
+    chat_signing_secret: SecretStr | None = None
+    chat_session_ttl_seconds: int = Field(default=1800, ge=60)
 
     # --- Rate limits (fixed windows, enforced by the check_rate_limit RPC) ---
     rate_limit_chat_max: int = Field(default=20, ge=1)
     rate_limit_chat_window_seconds: int = Field(default=600, ge=1)
+    rate_limit_chat_burst_max: int = Field(default=5, ge=1)
+    rate_limit_chat_burst_window_seconds: int = Field(default=60, ge=1)
+    # Site-wide cap on questions per UTC day (protects the Gemini bill from abuse).
+    rate_limit_chat_daily_global: int = Field(default=500, ge=1)
     rate_limit_contact_max: int = Field(default=3, ge=1)
     rate_limit_contact_window_seconds: int = Field(default=3600, ge=1)
     # Salt for hashing client IPs before they touch the database.
@@ -91,8 +112,34 @@ class Settings(BaseSettings):
     # --- Misc ---
     log_level: str = "INFO"
     environment: str = "development"
+    # Set automatically by Vercel ("production" | "preview" | "development").
+    vercel_env: str | None = None
+    vercel_url: str | None = None
+    vercel_branch_url: str | None = None
+    vercel_project_production_url: str | None = None
 
-    @field_validator("gemini_chat_fallback_models", "gemini_rewrite_fallback_models", mode="before")
+    @property
+    def is_deployed(self) -> bool:
+        """True on Vercel production *and* preview deployments: security fails closed there."""
+        return self.environment == "production" or self.vercel_env in {"production", "preview"}
+
+    @property
+    def trusted_origins(self) -> set[str]:
+        hosts = [self.vercel_url, self.vercel_branch_url, self.vercel_project_production_url]
+        origins = {f"https://{h}" for h in hosts if h}
+        if self.next_public_site_url:
+            origins.add(self.next_public_site_url.rstrip("/"))
+        origins.update(o.rstrip("/") for o in self.allowed_origins)
+        if not self.is_deployed:
+            origins.update({"http://localhost:3000", "http://127.0.0.1:3000"})
+        return origins
+
+    @field_validator(
+        "gemini_chat_fallback_models",
+        "gemini_rewrite_fallback_models",
+        "allowed_origins",
+        mode="before",
+    )
     @classmethod
     def split_model_list(cls, value: object) -> object:
         if isinstance(value, str):
